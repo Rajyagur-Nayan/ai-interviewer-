@@ -100,8 +100,8 @@ const Section3 = () => {
 
   return (
     <div>
-      <div className="p-6 space-y-6 max-w-7xl mx-auto">
-        <h1 className="text-3xl md:text-4xl font-bold leading-snug mb-6 text-gray-900 dark:text-white">
+      <div className="p-6 bg-white dark:bg-black  space-y-6 max-w-7xl mx-auto">
+        <h1 className="text-3xl  md:text-4xl font-bold leading-snug mb-6 text-gray-900 dark:text-white">
           Take Interviews
         </h1>
 

@@ -1,16 +1,15 @@
-// app/layout.tsx (or app/(protected)/layout.tsx)
-import { ReactNode } from "react";
-
 // Adjust path
 
-export default async function RootLayout({
+export default function RootLayout({
   children,
 }: {
-  children: ReactNode;
+  children: React.ReactNode;
 }) {
   return (
-    <html lang="en">
-      <body>{children}</body>
+    <html lang="en" className="dark">
+      <body>
+        <main>{children}</main>
+      </body>
     </html>
   );
 }

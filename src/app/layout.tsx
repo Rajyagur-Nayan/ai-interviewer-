@@ -12,7 +12,7 @@ const monaSans = Mona_Sans({
 
 export const metadata: Metadata = {
   title: "Interview Iq",
-  description: "Created by Nayan ",
+  description: "Created by Nayan",
 };
 
 export default async function RootLayout({
@@ -21,12 +21,12 @@ export default async function RootLayout({
   children: React.ReactNode;
 }>) {
   return (
-    <html lang="en" className="dark">
+    <html lang="en">
       <body
-        className={`${monaSans.className} antialiased flex flex-col  min-h-screen`}
+        className={`${monaSans.className} antialiased flex flex-col min-h-screen bg-white text-black dark:bg-zinc-900 dark:text-white transition-colors duration-300`}
       >
         <Navbar />
-        <main className="flex-grow">{children}</main>
+        <main>{children}</main>
         <Footer />
       </body>
     </html>

@@ -1,152 +1,53 @@
-import Link from "next/link";
-import React from "react";
+import { Mic, Brain, BarChart2 } from "lucide-react";
 
-const Section2 = () => {
-  interface InterviewData {
-    id: string;
-    userId: string;
-    role: string;
-    type: "Mock" | "Real" | "Practice";
-    techStack: string[];
-    level: "Beginner" | "Intermediate" | "Advanced";
-    questions: string[];
-    finalized: boolean;
-    createdAt: Date;
-  }
+const features = [
+  {
+    title: "Speak Your Answers",
+    description:
+      "Engage in natural conversations, answering questions just like a real interview. Our AI listens attentively.",
+    icon: <Mic className="text-blue-600 dark:text-blue-400 w-8 h-8 mb-2" />,
+  },
+  {
+    title: "Receive Instant Feedback",
+    description:
+      "Get immediate, actionable insights on your responses, tone, and delivery from our intelligent AI.",
+    icon: <Brain className="text-blue-600 dark:text-blue-400 w-8 h-8 mb-2" />,
+  },
+  {
+    title: "Track Your Progress",
+    description:
+      "Monitor your improvement over time with detailed reports and personalized recommendations for growth.",
+    icon: (
+      <BarChart2 className="text-blue-600 dark:text-blue-400 w-8 h-8 mb-2" />
+    ),
+  },
+];
 
-  const dummyInterviews: InterviewData[] = [
-    {
-      id: "1",
-      userId: "user101",
-      role: "Frontend Developer",
-      type: "Mock",
-      techStack: ["React", "TypeScript", "TailwindCSS"],
-      level: "Intermediate",
-      questions: [
-        "Explain the difference between props and state in React.",
-        "What are React Hooks?",
-      ],
-      finalized: true,
-      createdAt: new Date("2024-06-15T10:00:00Z"),
-    },
-    {
-      id: "2",
-      userId: "user102",
-      role: "Backend Developer",
-      type: "Practice",
-      techStack: ["Node.js", "Express", "MongoDB"],
-      level: "Beginner",
-      questions: ["What is REST API?", "How does Express handle routing?"],
-      finalized: false,
-      createdAt: new Date("2024-06-20T14:30:00Z"),
-    },
-    {
-      id: "3",
-      userId: "user103",
-      role: "Full Stack Engineer",
-      type: "Real",
-      techStack: ["React", "Node.js", "PostgreSQL"],
-      level: "Advanced",
-      questions: [
-        "Describe the MVC architecture.",
-        "How to implement authentication in a full-stack app?",
-      ],
-      finalized: true,
-      createdAt: new Date("2024-06-25T09:15:00Z"),
-    },
-    {
-      id: "4",
-      userId: "user104",
-      role: "Data Scientist",
-      type: "Mock",
-      techStack: ["Python", "Pandas", "Scikit-learn"],
-      level: "Intermediate",
-      questions: [
-        "What is the difference between supervised and unsupervised learning?",
-        "Explain the concept of overfitting.",
-      ],
-      finalized: false,
-      createdAt: new Date("2024-07-01T11:45:00Z"),
-    },
-    {
-      id: "5",
-      userId: "user105",
-      role: "DevOps Engineer",
-      type: "Practice",
-      techStack: ["Docker", "Kubernetes", "AWS"],
-      level: "Advanced",
-      questions: [
-        "How does container orchestration work with Kubernetes?",
-        "Explain CI/CD pipelines.",
-      ],
-      finalized: true,
-      createdAt: new Date("2024-07-03T15:20:00Z"),
-    },
-    {
-      id: "6",
-      userId: "user106",
-      role: "Mobile App Developer",
-      type: "Real",
-      techStack: ["React Native", "TypeScript"],
-      level: "Beginner",
-      questions: [
-        "What are the advantages of using React Native?",
-        "How does state management work in mobile apps?",
-      ],
-      finalized: false,
-      createdAt: new Date("2024-07-05T08:10:00Z"),
-    },
-  ];
-
+export default function FeaturesSection() {
   return (
-    <div>
-      <div className="p-6 space-y-6 max-w-7xl mx-auto">
-        <h1 className="text-3xl md:text-4xl font-bold leading-snug mb-6 text-gray-900 dark:text-white">
-          Your Interviews
-        </h1>
+    <section className="py-16 bg-gray-50 dark:bg-black transition-colors duration-300">
+      <div className="max-w-5xl mx-auto px-4 text-center">
+        <h2 className="text-2xl sm:text-3xl font-semibold mb-12 text-gray-900 dark:text-white">
+          Seamless Interview Practice in 3 Steps
+        </h2>
 
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-          {dummyInterviews.map((data) => (
+        <div className="grid gap-6 sm:grid-cols-2 md:grid-cols-3">
+          {features.map((feature, idx) => (
             <div
-              key={data.id}
-              className="border border-gray-200 dark:border-gray-700 p-6 rounded-xl shadow-lg bg-white dark:bg-gray-900 hover:scale-105 hover:shadow-2xl transition-all  
-              animate-in fade-in slide-in-from-bottom-6 "
+              key={idx}
+              className="bg-white dark:bg-zinc-900 p-6 rounded-lg shadow-sm dark:shadow-md border border-gray-200 dark:border-zinc-700 hover:shadow-md transition"
             >
-              <h2 className="font-bold text-xl mb-2 text-gray-900 dark:text-white">
-                {data.role} - {data.level}
-              </h2>
-              <p className="text-gray-600 dark:text-gray-300 mb-1">
-                Tech Stack: {data.techStack.join(", ")}
-              </p>
-              <p className="text-gray-600 dark:text-gray-300 mb-1">
-                Type: {data.type}
-              </p>
-              <p className="text-gray-600 dark:text-gray-300 mb-1">
-                Finalized:{" "}
-                <span
-                  className={data.finalized ? "text-green-500" : "text-red-500"}
-                >
-                  {data.finalized ? "Yes" : "No"}
-                </span>
-              </p>
-              <p className="text-gray-600 dark:text-gray-300 mb-1">
-                Questions: {data.questions.length}
-              </p>
-              <p className="text-gray-500 dark:text-gray-400 text-sm mb-5">
-                Date: {data.createdAt.toLocaleDateString()}
-              </p>
-              <Link
-                href="/"
-                className="bg-blue-600 px-4 py-2 rounded-2xl hover:bg-blue-700  text-white transition-colors cursor-pointer duration-300"
-              >
-                View Interview
-              </Link>
+              <div className="flex flex-col items-center text-gray-800 dark:text-white">
+                {feature.icon}
+                <h3 className="text-lg font-semibold mb-2">{feature.title}</h3>
+                <p className="text-sm text-gray-600 dark:text-gray-400">
+                  {feature.description}
+                </p>
+              </div>
             </div>
           ))}
         </div>
       </div>
-    </div>
+    </section>
   );
-};
-
-export default Section2;
+}
