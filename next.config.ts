@@ -9,8 +9,4 @@ const nextConfig: NextConfig = {
   },
 };
 
-// eslint-disable-next-line import/no-anonymous-default-export
-export default {
-  ...nextConfig,
-  darkMode: "class", // not 'media'
-};
+export default nextConfig;

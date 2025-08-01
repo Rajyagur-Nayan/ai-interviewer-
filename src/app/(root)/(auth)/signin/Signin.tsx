@@ -5,7 +5,7 @@ import { zodResolver } from "@hookform/resolvers/zod";
 import { Controller, useForm } from "react-hook-form";
 import { Button } from "@/components/ui/button";
 import { signInWithEmailAndPassword } from "firebase/auth";
-import { auth } from "../../../../firebase/client";
+import { auth } from "../../../../../firebase/client";
 import { signIn } from "@/lib/actions/auth.action";
 import { useRouter } from "next/navigation";
 import Link from "next/link";

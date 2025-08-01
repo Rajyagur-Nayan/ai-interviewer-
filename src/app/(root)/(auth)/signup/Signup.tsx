@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button";
 import { createUserWithEmailAndPassword } from "@firebase/auth";
 import { useRouter } from "next/navigation";
 
-import { auth } from "../../../../firebase/client";
+import { auth } from "../../../../../firebase/client";
 import { signup } from "@/lib/actions/auth.action";
 
 const formSchema = z.object({
