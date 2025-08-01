@@ -1,4 +1,3 @@
-"use client";
 import Agent from "@/app/components/Agent";
 // import { getCurrentUser } from "@/lib/actions/auth.action";
 import React from "react";

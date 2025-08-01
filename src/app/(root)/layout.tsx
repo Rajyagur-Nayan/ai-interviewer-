@@ -7,8 +7,8 @@ export default function RootLayout({
 }) {
   return (
     <html lang="en" className="dark">
-      <body>
-        <main>{children}</main>
+      <body className="">
+        <main className="flex-1">{children}</main>
       </body>
     </html>
   );
