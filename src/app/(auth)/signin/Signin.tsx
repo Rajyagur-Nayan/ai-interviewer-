@@ -39,7 +39,6 @@ const Signin = () => {
         e.email,
         e.password
       );
-
       const idToken = await userCredential.user.getIdToken();
       if (!idToken) {
         console.log("error login failed ");

@@ -1,7 +1,7 @@
 "use server";
 
 import { cookies } from "next/headers";
-import { auth, db } from "../../../firebase/admin";
+import { db, auth } from "../../../firebase/admin";
 
 interface signUp {
   uid: string;
@@ -14,6 +14,11 @@ interface signIn {
   email: string;
   idToken: string;
 }
+interface User {
+  id: string;
+  email: string;
+  userName?: string;
+}
 
 export async function signup(params: signUp) {
   const { uid, email, userName } = params;
@@ -21,7 +26,7 @@ export async function signup(params: signUp) {
   try {
     const userRecord = await db.collection("users").doc(uid).get();
 
-    if (!userRecord.exists) {
+    if (userRecord.exists) {
       return {
         success: false,
         message: "user already exist go to login ",
@@ -37,7 +42,7 @@ export async function signup(params: signUp) {
       message: "User created successfully",
     };
   } catch (error: any) {
-    console.log(error);
+    console.log("error creating at user ", error);
 
     if (error.code === "auth/email-already-exists") {
       return {
@@ -49,24 +54,6 @@ export async function signup(params: signUp) {
       success: false,
       massage: "failed to create a user ",
     };
-  }
-}
-
-export async function signIn(params: signIn) {
-  const { email, idToken } = params;
-
-  try {
-    const userRecord = await auth.getUserByEmail(email);
-
-    if (!userRecord) {
-      return {
-        success: false,
-        message: "failed To login ",
-      };
-    }
-    await sessionCookie(idToken);
-  } catch (error) {
-    console.log(error);
   }
 }
 
@@ -83,4 +70,57 @@ export async function sessionCookie(idToken: string) {
     path: "/",
     sameSite: "lax",
   });
+}
+
+export async function signIn(params: signIn) {
+  const { email, idToken } = params;
+
+  try {
+    const userRecord = await auth.getUserByEmail(email);
+
+    if (!userRecord) {
+      return {
+        success: false,
+        message: "User Does Not exist create an account  ",
+      };
+    }
+
+    await sessionCookie(idToken);
+  } catch (error) {
+    console.log(error);
+    return {
+      success: false,
+      message: "Failed to Login ",
+    };
+  }
+}
+
+export async function getCurrentUser(): Promise<User | null> {
+  const cookieStore = await cookies();
+  const sessionCookie = cookieStore.get("session")?.value;
+  if (!sessionCookie) return null;
+
+  try {
+    const decodedClaims = await auth.verifySessionCookie(sessionCookie, true);
+
+    const userRecord = await db
+      .collection("users")
+      .doc(decodedClaims.uid)
+      .get();
+
+    if (!userRecord.exists) return null;
+
+    return {
+      ...userRecord.data(),
+      id: userRecord.id,
+    } as User;
+  } catch (error) {
+    console.log(error);
+    return null;
+  }
+}
+
+export async function isAuthenticated() {
+  const user = await getCurrentUser();
+  return !!user;
 }

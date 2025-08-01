@@ -1,7 +1,7 @@
 "use client";
 import Link from "next/link";
 import { useState } from "react";
-import { Menu, X } from "lucide-react"; // Optional icons, install lucide-react
+import { CircleUserRound, Menu, X } from "lucide-react"; // Optional icons, install lucide-react
 
 export default function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
@@ -28,17 +28,25 @@ export default function Navbar() {
             <Link href="/contact" className="hover:text-primary">
               Contact
             </Link>
+            <Link href="/userprofile" className="hover:text-primary">
+              <CircleUserRound className="cursor-pointer text-2xl" />
+            </Link>
           </div>
 
           {/* Mobile Menu Toggle */}
-          <div className="md:hidden">
-            <button
-              type="button"
-              onClick={() => setIsOpen(!isOpen)}
-              className="btn btn-ghost"
-            >
-              {isOpen ? <X /> : <Menu />}
-            </button>
+          <div className="md:hidden flex gap-3  ">
+            <div>
+              <button
+                type="button"
+                onClick={() => setIsOpen(!isOpen)}
+                className="btn btn-ghost"
+              >
+                {isOpen ? <X /> : <Menu />}
+              </button>
+            </div>
+            <div>
+              <CircleUserRound />
+            </div>
           </div>
         </div>
 

@@ -49,17 +49,13 @@ const Signin = () => {
         uid: userCredential.user.uid,
         email: e.email,
         password: e.password,
-        userName: e.userName,
+        userName: e.userName!,
       });
 
-      if (!result) {
+      if (!result.success) {
         console.log("user is not created ");
         return;
       }
-
-      console.log(userCredential);
-      console.log(result);
-
       alert("User registered successfully");
       reset();
       router.push("/signin");

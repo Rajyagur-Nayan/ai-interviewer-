@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import { Mona_Sans } from "next/font/google";
 import "./globals.css";
+import { isAuthenticated } from "@/lib/actions/auth.action";
+import { redirect } from "next/navigation";
 import Navbar from "./components/Navbar";
 import Footer from "./components/Footer";
 
@@ -14,11 +16,15 @@ export const metadata: Metadata = {
   description: "Created by Nayan ",
 };
 
-export default function RootLayout({
+export default async function RootLayout({
   children,
 }: Readonly<{
   children: React.ReactNode;
 }>) {
+  const isAuthExist = await isAuthenticated();
+
+  if (!isAuthExist) redirect("/");
+
   return (
     <html lang="en" className="dark">
       <body
