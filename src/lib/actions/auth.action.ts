@@ -2,6 +2,7 @@
 
 import { cookies } from "next/headers";
 import { db, auth } from "../../../firebase/admin";
+import { NextResponse } from "next/server";
 
 interface signUp {
   uid: string;
@@ -56,20 +57,21 @@ export async function signup(params: signUp) {
     };
   }
 }
-
 export async function sessionCookie(idToken: string) {
-  const cookieStore = await cookies();
-  const sessionCooke = await auth.createSessionCookie(idToken, {
+  const sessionCookie = await auth.createSessionCookie(idToken, {
     expiresIn: 60 * 60 * 24 * 7 * 1000,
   });
 
-  cookieStore.set("session", sessionCooke, {
+  const response = NextResponse.redirect("/dashboard"); // or your desired redirect
+  response.cookies.set("session", sessionCookie, {
     maxAge: 60 * 60 * 24 * 7,
     httpOnly: true,
     secure: process.env.NODE_ENV === "production",
     path: "/",
     sameSite: "lax",
   });
+
+  return response;
 }
 
 export async function signIn(params: signIn) {
@@ -86,6 +88,10 @@ export async function signIn(params: signIn) {
     }
 
     await sessionCookie(idToken);
+    if (!sessionCookie) {
+      console.log("No session cookie found");
+      return null;
+    }
   } catch (error) {
     console.log(error);
     return {

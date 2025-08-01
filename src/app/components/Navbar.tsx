@@ -56,10 +56,10 @@ export default function Navbar() {
             <Link href="/" className="block hover:text-primary">
               Home
             </Link>
-            <Link href="/about" className="block hover:text-primary">
+            <Link href="/" className="block hover:text-primary">
               About
             </Link>
-            <Link href="/contact" className="block hover:text-primary">
+            <Link href="/" className="block hover:text-primary">
               Contact
             </Link>
           </div>

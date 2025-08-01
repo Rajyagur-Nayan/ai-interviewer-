@@ -32,7 +32,7 @@ interface message {
   role: "user" | "system" | "assistant"; // can adjust based on your app
 }
 
-const Agent = ({ userName, userId, type }: AgentProps) => {
+const Agent = ({ type }: AgentProps) => {
   const router = useRouter();
   const [callStatus, setCallStatus] = useState<CallStatus>(CallStatus.INACTIVE);
   const [isSpeaking, setIsSpeaking] = useState(false);
@@ -77,18 +77,13 @@ const Agent = ({ userName, userId, type }: AgentProps) => {
     if (callStatus === CallStatus.FINISHED) {
       console.log("end the interview ");
     }
-  }, [messages, callStatus, type, userId, router]);
+  }, [messages, callStatus, type, router]);
 
   const handleCall = async () => {
     setCallStatus(CallStatus.CONNECTING);
 
     try {
-      await vapi.start(process.env.NEXT_PUBLIC_WORKFLOW_TOKEN!, {
-        variableValues: {
-          userName,
-          userId,
-        },
-      });
+      await vapi.start(process.env.NEXT_PUBLIC_WORKFLOW_TOKEN!, {});
     } catch (error) {
       console.error("Workflow start failed:", error);
       setCallStatus(CallStatus.INACTIVE);

@@ -8,6 +8,7 @@ import { signInWithEmailAndPassword } from "firebase/auth";
 import { auth } from "../../../../firebase/client";
 import { signIn } from "@/lib/actions/auth.action";
 import { useRouter } from "next/navigation";
+import Link from "next/link";
 
 const formSchema = z.object({
   email: z.string().email(),
@@ -51,8 +52,8 @@ const Signin = () => {
       });
 
       console.log("login success");
-      reset();
       router.push("/");
+      reset();
     } catch (error) {
       console.log(error);
     }
@@ -124,9 +125,17 @@ const Signin = () => {
               );
             }}
           />
-          <Button className="bg-blue-700 px-6 py-2 text-white rounded-sm hover:bg-blue-600 mt-3 cursor-pointer">
-            Login
-          </Button>
+          <div className="flex md:flex-row flex-col gap-2">
+            <Button className="bg-blue-700 px-6 py-2 text-white rounded-sm hover:bg-blue-600 mt-3 cursor-pointer">
+              Login
+            </Button>
+            <Link
+              href="/signup"
+              className="bg-blue-700 px-6 py-2 flex items-center justify-center text-white rounded-sm hover:bg-blue-600 mt-3 cursor-pointer"
+            >
+              Register
+            </Link>
+          </div>
         </form>
       </div>
     </div>

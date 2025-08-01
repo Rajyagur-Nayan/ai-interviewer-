@@ -1,13 +1,16 @@
-import React, { ReactNode } from "react";
+// app/layout.tsx (or app/(protected)/layout.tsx)
+import { ReactNode } from "react";
 
-import { redirect } from "next/navigation";
-import { isAuthenticated } from "@/lib/actions/auth.action";
+// Adjust path
 
-const rootLayout = async ({ children }: { children: ReactNode }) => {
-  const isAuthExist = await isAuthenticated();
-
-  if (!isAuthExist) redirect("/signin");
-  return <div>{children}</div>;
-};
-
-export default rootLayout;
+export default async function RootLayout({
+  children,
+}: {
+  children: ReactNode;
+}) {
+  return (
+    <html lang="en">
+      <body>{children}</body>
+    </html>
+  );
+}
