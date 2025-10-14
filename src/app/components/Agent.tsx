@@ -4,9 +4,11 @@ import { cn } from "@/lib/utils";
 import { vapi } from "@/lib/vapi.sdk";
 import Image from "next/image";
 import { useRouter } from "next/navigation";
+import React, { useEffect, useState, ReactNode } from "react";
+import { motion, AnimatePresence } from "framer-motion";
+import { Mic, PhoneOff, Loader, RefreshCw } from "lucide-react";
 
-import React, { useEffect, useState } from "react";
-
+// --- Enums & Types (Unchanged) ---
 export enum CallStatus {
   INACTIVE = "INACTIVE",
   ACTIVE = "ACTIVE",
@@ -25,13 +27,14 @@ interface SavedMessage {
   content: string;
 }
 
-interface message {
-  type: "transcript" | string; // could be other types depending on your system
-  transcriptType?: "final" | "partial"; // optional if not always present
-  transcript?: string; // actual text of the message
-  role: "user" | "system" | "assistant"; // can adjust based on your app
+interface Message {
+  type: "transcript" | string;
+  transcriptType?: "final" | "partial";
+  transcript?: string;
+  role: "user" | "system" | "assistant";
 }
 
+// --- Main Agent Component ---
 const Agent = ({ type }: AgentProps) => {
   const router = useRouter();
   const [callStatus, setCallStatus] = useState<CallStatus>(CallStatus.INACTIVE);
@@ -39,10 +42,17 @@ const Agent = ({ type }: AgentProps) => {
   const [messages, setMessages] = useState<SavedMessage[]>([]);
 
   useEffect(() => {
+    // Event listeners for the Vapi SDK
     const onCallStart = () => setCallStatus(CallStatus.ACTIVE);
     const onCallEnd = () => setCallStatus(CallStatus.FINISHED);
+    const onSpeechStart = () => setIsSpeaking(true);
+    const onSpeechEnd = () => setIsSpeaking(false);
+    const onError = (error: Error) => {
+      console.error("Vapi Error:", error);
+      setCallStatus(CallStatus.INACTIVE); // Reset on error
+    };
 
-    const onMessage = (message: message) => {
+    const onMessage = (message: Message) => {
       if (message.type === "transcript" && message.transcriptType === "final") {
         const newMessage = {
           role: message.role,
@@ -51,10 +61,6 @@ const Agent = ({ type }: AgentProps) => {
         setMessages((prev) => [...prev, newMessage]);
       }
     };
-
-    const onSpeechStart = () => setIsSpeaking(true);
-    const onSpeechEnd = () => setIsSpeaking(false);
-    const onError = (error: Error) => console.log(error);
 
     vapi.on("call-start", onCallStart);
     vapi.on("call-end", onCallEnd);
@@ -75,107 +81,188 @@ const Agent = ({ type }: AgentProps) => {
 
   useEffect(() => {
     if (callStatus === CallStatus.FINISHED) {
-      console.log("end the interview ");
+      console.log("Interview has ended. You can now redirect or show results.");
+      // Example: setTimeout(() => router.push('/results'), 3000);
     }
-  }, [messages, callStatus, type, router]);
+  }, [callStatus, router]);
 
   const handleCall = async () => {
     setCallStatus(CallStatus.CONNECTING);
-
     try {
-      await vapi.start(process.env.NEXT_PUBLIC_WORKFLOW_TOKEN!, {});
+      // For production, use a more secure way to fetch the token if needed
+      await vapi.start(process.env.NEXT_PUBLIC_WORKFLOW_TOKEN!);
     } catch (error) {
       console.error("Workflow start failed:", error);
       setCallStatus(CallStatus.INACTIVE);
     }
   };
 
-  const handleEndCall = async () => {
-    setCallStatus(CallStatus.FINISHED);
+  const handleEndCall = () => {
     vapi.stop();
+    setCallStatus(CallStatus.FINISHED);
   };
 
-  const lastMessage = messages[messages.length - 1]?.content;
-  const isCallInactiveAndFinished =
-    callStatus === CallStatus.INACTIVE || callStatus === CallStatus.FINISHED;
+  const handleRestart = () => {
+    setMessages([]);
+    setCallStatus(CallStatus.INACTIVE);
+    handleCall();
+  };
+
+  const lastMessage =
+    messages.length > 0 ? messages[messages.length - 1] : null;
 
   return (
-    <div className="min-h-screen bg-black text-white flex flex-col items-center justify-center px-4">
-      <main className="w-full max-w-5xl flex flex-col md:flex-row gap-6">
-        {/* Interviewer Panel */}
-        <div className="flex-1 bg-purple-700 text-white flex flex-col items-center justify-center p-6 rounded-2xl">
-          <div className="text-center relative">
-            <div className="w-28 h-28 mx-auto rounded-full overflow-hidden border-4 border-white shadow-lg mb-4 relative">
-              <Image
-                src="/img1.jpg"
-                alt="AI Interviewer"
-                width={112}
-                height={112}
-                className="object-cover w-full h-full"
-              />
-              {isSpeaking && (
-                <span className="absolute top-0 left-0 w-full h-full animate-ping bg-gray-400 rounded-full opacity-30" />
-              )}
-            </div>
-            <h2 className="text-2xl font-bold mb-2">AI Interviewer</h2>
-            <p className="text-sm opacity-80">Ready to assess your skills</p>
-          </div>
-        </div>
+    <div className="min-h-screen bg-slate-950 text-white flex flex-col items-center justify-center p-4 relative overflow-hidden">
+      {/* Background Glows for ambiance */}
+      <div className="absolute top-0 left-0 w-96 h-96 bg-blue-500/20 rounded-full blur-3xl animate-pulse"></div>
+      <div className="absolute bottom-0 right-0 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl animate-pulse delay-1000"></div>
 
-        {/* Client Panel */}
-        <div className="flex-1 bg-gray-800 text-white md:block hidden  flex-col items-center justify-center p-6 rounded-2xl">
-          <div className="text-center">
-            <div className="w-28 h-28 mx-auto rounded-full overflow-hidden border-4 border-white shadow-lg mb-4">
-              <Image
-                src="/img1.jpg"
-                alt="User"
-                width={112}
-                height={112}
-                className="object-cover w-full h-full"
-              />
-            </div>
-            <h2 className="text-2xl font-bold mb-2">You</h2>
-            <p className="text-sm opacity-80">Let&apos;s begin the interview</p>
-          </div>
-        </div>
-      </main>
-
-      <div className="mt-5">
-        {messages.length > 0 && lastMessage && (
-          <div className="p-4 bg-gray-800 rounded-lg w-full shadow">
-            <p className="text-white text-base">{lastMessage}</p>
-          </div>
-        )}
-      </div>
-
-      {/* Call Control Button */}
-      <div className="flex justify-center mt-8">
-        {callStatus !== "ACTIVE" ? (
-          <button
-            type="button"
-            className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold shadow-md transition duration-300 ease-in-out transform hover:scale-105 active:scale-95"
-            onClick={handleCall}
+      {/* Main Interview Card */}
+      <motion.div
+        initial={{ opacity: 0, scale: 0.9 }}
+        animate={{ opacity: 1, scale: 1 }}
+        transition={{ duration: 0.5, ease: "easeOut" }}
+        className="w-full max-w-md bg-slate-900/50 backdrop-blur-lg border border-slate-800 rounded-3xl p-8 flex flex-col items-center gap-6 shadow-2xl shadow-black/20"
+      >
+        {/* AI Avatar */}
+        <div className="relative">
+          <motion.div
+            animate={{
+              scale: isSpeaking ? [1, 1.05, 1] : 1,
+              boxShadow: isSpeaking
+                ? [
+                    "0 0 0 0px rgba(79, 70, 229, 0)",
+                    "0 0 0 10px rgba(79, 70, 229, 0.4)",
+                    "0 0 0 0px rgba(79, 70, 229, 0)",
+                  ]
+                : "0 0 0 0px rgba(79, 70, 229, 0)",
+            }}
+            transition={{ duration: 1.5, repeat: Infinity, ease: "easeInOut" }}
+            className="rounded-full"
           >
-            <span
-              className={cn(
-                "absolute animate-ping rounded-full opacity-75",
-                callStatus !== "CONNECTING" && "hidden"
-              )}
+            <Image
+              src="/img1.jpg" // Replace with your AI avatar image
+              alt="AI Interviewer"
+              width={160}
+              height={160}
+              className="rounded-full object-cover border-4 border-slate-700"
             />
-            <span>{isCallInactiveAndFinished ? "call" : "..."}</span>
-          </button>
-        ) : (
-          <button
-            type="button"
-            onClick={handleEndCall}
-            className="px-6 py-3 bg-purple-600 hover:bg-purple-700 text-white rounded-lg font-semibold shadow-md transition duration-300 ease-in-out transform hover:scale-105 active:scale-95"
-          >
-            End
-          </button>
-        )}
-      </div>
+          </motion.div>
+        </div>
+
+        <div className="text-center">
+          <h2 className="text-3xl font-bold">AI Interviewer</h2>
+          <p className="text-slate-400">Ready to begin your assessment.</p>
+        </div>
+
+        {/* Status & Transcript Display */}
+        <StatusDisplay status={callStatus} lastMessage={lastMessage} />
+
+        {/* Call Controls */}
+        <CallButton
+          status={callStatus}
+          onStart={handleCall}
+          onEnd={handleEndCall}
+          onRestart={handleRestart}
+        />
+      </motion.div>
     </div>
   );
+};
+
+// --- Child Components for better organization ---
+
+// Component to display status and animated messages
+const StatusDisplay = ({
+  status,
+  lastMessage,
+}: {
+  status: CallStatus;
+  lastMessage: SavedMessage | null;
+}) => {
+  let text = "Click the microphone to start the interview.";
+  if (status === CallStatus.CONNECTING) text = "Connecting...";
+  if (status === CallStatus.ACTIVE)
+    text = lastMessage?.content ?? "Listening...";
+  if (status === CallStatus.FINISHED) text = "Interview has ended. Thank you!";
+
+  return (
+    <div className="w-full h-20 text-center flex items-center justify-center bg-slate-800/50 rounded-lg p-4">
+      <AnimatePresence mode="wait">
+        <motion.p
+          key={text}
+          initial={{ opacity: 0, y: 10 }}
+          animate={{ opacity: 1, y: 0 }}
+          exit={{ opacity: 0, y: -10 }}
+          transition={{ duration: 0.3 }}
+          className="text-slate-300 italic"
+        >
+          &ldquo;{text}&rdquo;
+        </motion.p>
+      </AnimatePresence>
+    </div>
+  );
+};
+
+// Component to handle the different button states
+const CallButton = ({
+  status,
+  onStart,
+  onEnd,
+  onRestart,
+}: {
+  status: CallStatus;
+  onStart: () => void;
+  onEnd: () => void;
+  onRestart: () => void;
+}) => {
+  const commonClasses =
+    "flex items-center justify-center w-20 h-20 rounded-full font-semibold shadow-lg transition-all duration-300 ease-in-out transform hover:scale-105 active:scale-95 disabled:opacity-50 disabled:scale-100";
+  let button: ReactNode;
+
+  switch (status) {
+    case CallStatus.CONNECTING:
+      button = (
+        <button
+          className={cn(commonClasses, "bg-yellow-600 cursor-not-allowed")}
+          disabled
+        >
+          <Loader className="animate-spin" size={32} />
+        </button>
+      );
+      break;
+    case CallStatus.ACTIVE:
+      button = (
+        <button
+          onClick={onEnd}
+          className={cn(commonClasses, "bg-red-600 hover:bg-red-700")}
+        >
+          <PhoneOff size={32} />
+        </button>
+      );
+      break;
+    case CallStatus.FINISHED:
+      button = (
+        <button
+          onClick={onRestart}
+          className={cn(commonClasses, "bg-blue-600 hover:bg-blue-700")}
+        >
+          <RefreshCw size={32} />
+        </button>
+      );
+      break;
+    default: // INACTIVE
+      button = (
+        <button
+          onClick={onStart}
+          className={cn(commonClasses, "bg-indigo-600 hover:bg-indigo-700")}
+        >
+          <Mic size={32} />
+        </button>
+      );
+  }
+
+  return <div className="mt-4">{button}</div>;
 };
 
 export default Agent;
