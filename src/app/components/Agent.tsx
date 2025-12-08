@@ -35,7 +35,7 @@ interface Message {
 }
 
 // --- Main Agent Component ---
-const Agent = ({ type }: AgentProps) => {
+const Agent = ({}: AgentProps) => {
   const router = useRouter();
   const [callStatus, setCallStatus] = useState<CallStatus>(CallStatus.INACTIVE);
   const [isSpeaking, setIsSpeaking] = useState(false);
