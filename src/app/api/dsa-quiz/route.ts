@@ -36,7 +36,7 @@ export async function POST(request: Request) {
 
     // 2. Use `generateObject` with the schema
     const { object: quizQuestions } = await generateObject({
-      model: google("gemini-2.5-pro"), // Using a modern model is recommended
+      model: google("gemini-2.5-flash"), // Using a modern model is recommended
       schema: z.array(quizQuestionSchema), // We expect an array of questions
       prompt: `
         Generate ${amount} multiple-choice questions (MCQs) on Data Structures and Algorithms.
