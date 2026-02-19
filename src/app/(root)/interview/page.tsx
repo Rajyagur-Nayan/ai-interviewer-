@@ -1,4 +1,5 @@
 import Agent from "@/app/components/Agent";
+import logo from lucide-react;
 // import { getCurrentUser } from "@/lib/actions/auth.action";
 import React from "react";
 
